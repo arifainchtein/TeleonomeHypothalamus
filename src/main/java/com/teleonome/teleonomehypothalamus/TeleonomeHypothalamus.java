@@ -33,7 +33,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	JSONObject organismViewStatusInfoJSONObject = new JSONObject();
 	public final static Logger observerThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + ObserverThread.class.getSimpleName());
 	public final static Logger subscriberThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + SubscriberThread.class.getSimpleName());
-	public final static String BUILD_NUMBER="02/05/2018 12:27";
+	public final static String BUILD_NUMBER="02/05/2018 14:33";
 	PulseThread aPulseThread = new PulseThread(this);
 	Hashtable teleonomeNamePulseIsLateIndex = new Hashtable();
 	
