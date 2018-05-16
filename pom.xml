@@ -19,7 +19,7 @@
   <repositories>
     <repository>
         <id>local-maven-repo</id>
-        <url>file:///Users/arifainchtein/.m2</url>
+        <url>file:///home/pi/.m2</url>
     </repository>
      <repository>
         <id>Eclipse Paho Repo</id>
@@ -154,6 +154,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
+         <outputDirectory>../../</outputDirectory>
           <archive>
             <manifestEntries>
               <Premain-Class>com.teleonome.objectsizer.ObjectSizeFetcher</Premain-Class>
@@ -237,50 +238,6 @@
         </replacements>
     </configuration>
 </plugin> 
-  <!-- =========================================== -->
-    <!-- make sure antrun is after packaging plugins -->
-    <!-- =========================================== -->
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-antrun-plugin</artifactId>
-      <version>1.8</version>
-      <executions>
-        <execution>
-          <id>scp-to-remote</id>
-          <phase>package</phase>
-          <goals>
-            <goal>run</goal>
-          </goals>
-          <configuration>
-            <target>
-              <!-- keyfile+passphrase or  password, choose one -->
-              <scp localFile="${project.basedir}/target/TeleonomeHypothalamus.jar"
-                remoteToFile="pi@${teleonome.name}.local:/home/pi/Teleonome/TeleonomeHypothalamus.jar" verbose="true"
-                keyfile="/Users/arifainchtein/.ssh/chilhuacle"
-                passphrase="">
-              </scp>
-            </target>
-          </configuration>
-        </execution>
-      </executions>
-      <!-- libraries for scp impl      -->
-      <!-- antrun doesn't use os's scp -->
-      <dependencies>
-        <dependency>
-          <groupId>com.jcraft</groupId>
-          <artifactId>jsch</artifactId>
-          <version>0.1.53</version>
-        </dependency>
-        <dependency>
-          <groupId>ant</groupId>
-          <artifactId>ant-jsch</artifactId>
-          <version>1.6.5</version>
-        </dependency>
-      </dependencies>
-    </plugin>
-    <!-- =========================================== -->
-    <!--   antrun plugin end                         -->
-    <!-- =========================================== -->
     </plugins>
 </build>
 </project>
