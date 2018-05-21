@@ -197,7 +197,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 		Socket subscriber;
 		JSONObject whoAmI=null;
 		JSONObject howAmI=null;
-		String contents="";
+		
 		String topic;
 		Vector externalTeleonomeNamesVector;
 		public SubscriberThread(String t, String n){
@@ -223,7 +223,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			Identity learnOtherHistoryDeneActiveIdentity= null;
 			boolean learnOtherHistory=false;
 			Identity learnOtherHistoryTeleonomeNameIdentity=null;
-			JSONObject jsonMessage = null;
+			
 			boolean pulseLate = false;
 			
 			String lastPulseTimestamp = "";
@@ -239,8 +239,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			
 			
 			while(true){
+				JSONObject jsonMessage = null;
 				topic = subscriber.recvStr ().trim();
-				contents = subscriber.recvStr ().trim();
+				String contents = subscriber.recvStr ().trim();
 				 learnMyHistoryDeneActiveIdentity= new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_INTERNAL + ":" +  TeleonomeConstants.DENECHAIN_MNEMOSYCONS + ":" + TeleonomeConstants.DENE_NAME_MNEMOSYCON_LEARN_MY_HISTORY +":" + TeleonomeConstants.DENEWORD_ACTIVE);
 				 learnMyHistory=false;
 				 learnOtherHistoryTeleonomeName="";
@@ -373,7 +374,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						}
 					}
 				}
+				jsonMessage=null;
 				contents=null;
+				System.gc();
 			}
 		}
 	}
