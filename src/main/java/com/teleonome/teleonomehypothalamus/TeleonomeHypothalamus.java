@@ -205,6 +205,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			teleonomeName=n;
 			
 			subscriber = exoZeroContext.socket(ZMQ.SUB);
+			subscriber.setRcvHWM(1);
 			subscriber.connect("tcp://"+ teleonomeAddress +":5563"); 
 			subscriberThreadLogger.debug("subscribed to " + teleonomeName + ":" + teleonomeAddress);
 			subscriberList.put(teleonomeAddress, subscriber);
@@ -242,6 +243,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				JSONObject jsonMessage = null;
 				topic = subscriber.recvStr ().trim();
 				String contents = subscriber.recvStr ().trim();
+				
 				 learnMyHistoryDeneActiveIdentity= new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_INTERNAL + ":" +  TeleonomeConstants.DENECHAIN_MNEMOSYCONS + ":" + TeleonomeConstants.DENE_NAME_MNEMOSYCON_LEARN_MY_HISTORY +":" + TeleonomeConstants.DENEWORD_ACTIVE);
 				 learnMyHistory=false;
 				 learnOtherHistoryTeleonomeName="";
