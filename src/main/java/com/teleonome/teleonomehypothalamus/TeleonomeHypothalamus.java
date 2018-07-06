@@ -332,11 +332,16 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						// now check to see if this subscriber is waiting for data,ie, its external data referencing this telenome is stale
 						//
 						boolean somebodyIsWating = DenomeUtils.isSomebodyWaitingForMe( aDenomeManager.getDenomeName(), jsonMessage);
-						logger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
-						stopExoZeroPublisher();
-						stopExoZeroPublisher();
+						if(somebodyIsWating) {
+							logger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
+							
+							stopExoZeroPublisher();
+							startExoZeroPublisher();
+							logger.info( "  restarted the exozero publisher");
+						}else{
+							logger.info(teleonomeName + " is NOT waiting for data from " + aDenomeManager.getDenomeName()  );
+						}
 						
-						logger.info( "  restarted the exozero publisher");
 						
 					} catch (JSONException e1) {
 						// TODO Auto-generated catch block
