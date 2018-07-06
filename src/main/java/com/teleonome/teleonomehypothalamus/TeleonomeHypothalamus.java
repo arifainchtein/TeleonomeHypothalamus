@@ -33,9 +33,11 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	JSONObject organismViewStatusInfoJSONObject = new JSONObject();
 	public final static Logger observerThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + ObserverThread.class.getSimpleName());
 	public final static Logger subscriberThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + SubscriberThread.class.getSimpleName());
-	public final static String BUILD_NUMBER="14/05/2018 08:26";
+	public final static Logger selfSubscriberThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + SubscriberThread.class.getSimpleName());
+	public final static String BUILD_NUMBER="05/06/2018 13:36";
 	PulseThread aPulseThread = new PulseThread(this);
 	Hashtable teleonomeNamePulseIsLateIndex = new Hashtable();
+	public long selfPublisherLastPulseTimeMillis=0;
 	
 	public TeleonomeHypothalamus(){
 
@@ -62,6 +64,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	class ObserverThread extends Thread{
 		JmDNS mdnsServer;
 		int subscriberThreadCounter=0;
+		
+		String thisTeleonomeName;
+		String thisTeleonomAddress;
 		public ObserverThread(){
 			String bonjourServiceType = "_teleonome._tcp.local.";
 
@@ -73,7 +78,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				ServiceInfo testService = ServiceInfo.create(bonjourServiceType, hostName, 6666, "Teleonome service");
 				mdnsServer.registerService(testService);
 				logger.info("created teleonome service");
-
+				thisTeleonomeName = aDenomeManager.getDenomeName();
+				
+								
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				logger.warn(Utils.getStringException(e));
@@ -91,7 +98,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			Iterator whoAmIKeys=null;
 			String whoAmIAttributeName="";
 			String whoAmIAttributeType="";
-			String thisTeleonomeName = aDenomeManager.getDenomeName();
+			
 			SubscriberThread aSubscriberThread;	
 			Hashtable presentTeleonoms;
 			Hashtable notPresentTeleonoms;
@@ -106,6 +113,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					observerThreadLogger.debug("there are notPresentTeleonoms=" + notPresentTeleonoms.size());
 					observerThreadLogger.debug("teleonomesToReconnect=" + teleonomesToReconnect + " teleonomesToReconnect.size()=" + teleonomesToReconnect.size());
 
+					
+					
 					for(Enumeration<String> en=notPresentTeleonoms.keys();en.hasMoreElements();){
 						teleonomName = (String)en.nextElement();
 						observerThreadLogger.debug("Not Found teleonome " + teleonomName);
@@ -319,8 +328,16 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 						 ssidJSONArray = NetworkUtilities.getSSID(false);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_AVAILABLE_SSIDS, ssidJSONArray.toString());
-
-
+						//
+						// now check to see if this subscriber is waiting for data,ie, its external data referencing this telenome is stale
+						//
+						boolean somebodyIsWating = DenomeUtils.isSomebodyWaitingForMe( aDenomeManager.getDenomeName(), jsonMessage);
+						logger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
+						stopExoZeroPublisher();
+						stopExoZeroPublisher();
+						
+						logger.info( "  restarted the exozero publisher");
+						
 					} catch (JSONException e1) {
 						// TODO Auto-generated catch block
 						subscriberThreadLogger.warn("invalid pulse received from " + teleonomeName + ":" + teleonomeAddress  + " " + contents);
@@ -382,6 +399,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			}
 		}
 	}
+	
+	
+	
 
 
 
