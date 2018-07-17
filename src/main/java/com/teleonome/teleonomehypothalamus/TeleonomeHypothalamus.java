@@ -3,9 +3,11 @@ package com.teleonome.teleonomehypothalamus;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.TimeZone;
 import java.util.Vector;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -319,6 +321,26 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						//
 						if(aPulseThread.isPersistenceOrganismPulses()) {
 							aDBManager.storeOrganismPulse(teleonomeName,localIpAddress,contents,tSatus,  operationMode,  identityPointer, lastPulseTime);	
+						}
+						
+						//
+						// now check to see if any words need to be unwrapped
+						String rememberedWordPointer;
+						Object value;
+						String valueType;
+						Hashtable<String,ArrayList> deneWordsToRememberByTeleonome = aDenomeManager.getDeneWordsToRememberByTeleonome();
+						ArrayList teleonomeRememberedWordsArrayList = deneWordsToRememberByTeleonome.get(teleonomeName);
+						logger.debug("for " + teleonomeName + " teleonomeRememberedWordsArrayList: " + teleonomeRememberedWordsArrayList );
+						
+						if(teleonomeRememberedWordsArrayList!=null && teleonomeRememberedWordsArrayList.size()>0) {
+							TimeZone timeZone = aDenomeManager.getTeleonomeTimeZone();
+							for( int i=0;i<teleonomeRememberedWordsArrayList.size();i++) {
+								rememberedWordPointer = (String) teleonomeRememberedWordsArrayList.get(i);
+								value = aDenomeManager.getDeneWordAttributeByIdentity(new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+								valueType = (String) aDenomeManager.getDeneWordAttributeByIdentity(new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+								logger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value );
+								aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value);
+							}
 						}
 						//
 						// nw publish the name of the teleonome and the bootstrapStatus
