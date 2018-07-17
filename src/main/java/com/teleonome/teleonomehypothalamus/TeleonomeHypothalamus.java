@@ -361,7 +361,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							startExoZeroPublisher();
 							logger.info( "  restarted the exozero publisher");
 						}else{
-							logger.info(teleonomeName + " is NOT waiting for data from " + aDenomeManager.getDenomeName()  );
+							logger.info(teleonomeName + " is NOT1 waiting for data from " + aDenomeManager.getDenomeName()  );
 						}
 						
 						
