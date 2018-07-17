@@ -329,6 +329,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						Object value;
 						String valueType;
 						Hashtable<String,ArrayList> deneWordsToRememberByTeleonome = aDenomeManager.getDeneWordsToRememberByTeleonome();
+						subscriberThreadLogger.debug("deneWordsToRememberByTeleonome " + deneWordsToRememberByTeleonome );
+						
 						ArrayList teleonomeRememberedWordsArrayList = deneWordsToRememberByTeleonome.get(teleonomeName);
 						subscriberThreadLogger.debug("for " + teleonomeName + " teleonomeRememberedWordsArrayList: " + teleonomeRememberedWordsArrayList );
 						
@@ -336,8 +338,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							TimeZone timeZone = aDenomeManager.getTeleonomeTimeZone();
 							for( int i=0;i<teleonomeRememberedWordsArrayList.size();i++) {
 								rememberedWordPointer = (String) teleonomeRememberedWordsArrayList.get(i);
-								value = aDenomeManager.getDeneWordAttributeByIdentity(new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
-								valueType = (String) aDenomeManager.getDeneWordAttributeByIdentity(new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+								value = DenomeUtils.getDeneWordByIdentity(jsonMessage,new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+								valueType = (String) DenomeUtils.getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value );
 								aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value);
 							}
