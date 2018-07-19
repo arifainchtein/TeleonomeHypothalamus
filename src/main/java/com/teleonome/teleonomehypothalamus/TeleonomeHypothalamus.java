@@ -346,7 +346,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						}
 						//
 						// nw publish the name of the teleonome and the bootstrapStatus
-						//
+						// 
 						organismViewStatusInfoJSONObject.put(teleonomeName,bootstrapStatus);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_STATUS, organismViewStatusInfoJSONObject.toString());
 
@@ -485,7 +485,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									// lastPulseExternalTeleonomeJSONObject contains the last pulse
 									// of that teleonome
 									//
-									logger.debug("line 662 Denomemutils, looking for  " + externalDataDeneName);
+									logger.debug("looking for  " + externalDataDeneName);
 									if(publisherTeleonomeName.equals(externalDataDeneName)) {
 								
 										String externalDeneStatus=TeleonomeConstants.EXTERNAL_DATA_STATUS_STALE;
