@@ -13,6 +13,7 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +24,6 @@ import org.zeromq.ZMQ.Socket;
 
 import com.teleonome.framework.TeleonomeConstants;
 import com.teleonome.framework.denome.Identity;
-import com.teleonome.framework.denome.DenomeUtils;
 import com.teleonome.framework.exception.InvalidDenomeException;
 import com.teleonome.framework.hypothalamus.Hypothalamus;
 import com.teleonome.framework.hypothalamus.PulseThread;
@@ -297,14 +297,14 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						lastPulseTime = jsonMessage.getLong("Pulse Timestamp in Milliseconds");
 						 lastPulseTimestamp = jsonMessage.getString("Pulse Timestamp");
 						 identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_OPERATIONAL_MODE);
-						 statusMessage = (String)DenomeUtils.getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+						 statusMessage = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 
 						identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_OPERATIONAL_STATUS_BOOTSTRAP_EQUIVALENT);
-						 bootstrapStatus = (String)DenomeUtils.getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+						 bootstrapStatus = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 						subscriberThreadLogger.debug("received from#" + teleonomeName + "#" + teleonomeAddress  + "#" + lastPulseTimestamp + "#" + statusMessage + "#" + bootstrapStatus);
 						if(bootstrapStatus==null)bootstrapStatus="success";
 						identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_STATUS);
-						 operationMode = (String)DenomeUtils.getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+						 operationMode = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 
 						 identityPointer=teleonomeName;
 						 tSatus= teleonomeName + " " +  TeleonomeConstants.EXTERNAL_DATA_STATUS_OK;
@@ -338,9 +338,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							TimeZone timeZone = aDenomeManager.getTeleonomeTimeZone();
 							for( int i=0;i<teleonomeRememberedWordsArrayList.size();i++) {
 								rememberedWordPointer = (String) teleonomeRememberedWordsArrayList.get(i);
-								value = DenomeUtils.getDeneWordByIdentity(jsonMessage,new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
-								valueType = (String) DenomeUtils.getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
-								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value );
+								value = getDeneWordByIdentity(jsonMessage,new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+								valueType = (String) getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value  + " and valueType=" + valueType);
 								aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value);
 							}
 						}
@@ -355,7 +355,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						//
 						// now check to see if this subscriber is waiting for data,ie, its external data referencing this telenome is stale
 						//
-						boolean somebodyIsWating = DenomeUtils.isSomebodyWaitingForMe( aDenomeManager.getDenomeName(), jsonMessage);
+						boolean somebodyIsWating = isSomebodyWaitingForMe( aDenomeManager.getDenomeName(), jsonMessage);
 						if(somebodyIsWating) {
 							logger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
 							
@@ -363,7 +363,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							startExoZeroPublisher();
 							subscriberThreadLogger.info( "  restarted the exozero publisher");
 						}else{
-							subscriberThreadLogger.info(teleonomeName + " is NOT1 waiting for data from " + aDenomeManager.getDenomeName()  );
+							subscriberThreadLogger.info(teleonomeName + " is NOT waiting for data from " + aDenomeManager.getDenomeName()  );
 						}
 						
 						
@@ -396,7 +396,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					}else if(learnOtherHistory){
 						String pulseReceivedTeleonomeName=null;
 						try {
-							pulseReceivedTeleonomeName = DenomeUtils.getTeleonomeName(jsonMessage);
+							pulseReceivedTeleonomeName = jsonMessage.getJSONObject("Denome").getString("Name");
+							
 						} catch (JSONException e1) {
 							// TODO Auto-generated catch block
 							subscriberThreadLogger.warn(Utils.getStringException(e1));
@@ -407,7 +408,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							// if we are here is because we are remembering data from other teleonomes
 							try {
 								 identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_OPERATIONAL_MODE);
-								 operationMode = (String)DenomeUtils.getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+								 operationMode = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 								 identityPointer=teleonomeName;
 								 tSatus= teleonomeName + " " +  TeleonomeConstants.EXTERNAL_DATA_STATUS_OK;
 								if(!aDBManager.containsOrganismPulse(lastPulseTime, learnOtherHistoryTeleonomeName)) {
@@ -427,6 +428,188 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				System.gc();
 			}
 		}
+		
+		
+		/**
+		 * This method is used by the subscriber thread, to detect if there is a problem with
+		 * the exozero network, ie if there is another teleonome waiting for data from this 
+		 * teleonome.
+		 * if it returns true then the exozero publisher needs to be restarted
+		 * There are two places to check, the external data and all the mnemosycons of type DENE_TYPE_MNEMOSYCON_DENEWORDS_TO_REMEMBER
+		 * 
+		 * @param publisherTeleonomeName - the name of the publisher teleonome
+		 * @param dependentTeleonomePulse - the data of the teleonome dependind of the publisherteleonome data
+		 * @return
+		 */
+		public boolean isSomebodyWaitingForMe(String publisherTeleonomeName, JSONObject dependentTeleonomePulse){
+			//
+			// get the address of the deneword where this data is going to
+			String reportingAddress, deneWordName;
+			Vector teleonomeToReconnect = new Vector();
+			boolean somebodyIsWating=false;
+			try {
+				
+				JSONObject dependentPulseDenome = dependentTeleonomePulse.getJSONObject("Denome");
+				String dependentTeleonomeName = dependentPulseDenome.getString("Name");
+				JSONArray dependentPulseNuclei = dependentPulseDenome.getJSONArray("Nuclei");
+				JSONArray deneWords;
+
+				JSONObject jsonObject, jsonObjectChain, jsonObjectDene, jsonObjectDeneWord;
+				JSONArray chains, denes;
+				String externalDataDeneName;
+				JSONObject lastPulseExternalTeleonomeJSONObject;
+				String externalSourceOfData;
+
+				
+				long lastPulseExternalTimeInMillis,difference;
+				String lastPulseExternalTime;
+				Identity externalDataCurrentPulseIdentity,numberOfPulseForStaleIdentity;
+				int secondsToStale=180;
+				//String valueType;
+
+				for(int i=0;i<dependentPulseNuclei.length();i++){
+					jsonObject = dependentPulseNuclei.getJSONObject(i);
+					if(jsonObject.getString("Name").equals(TeleonomeConstants.NUCLEI_PURPOSE)){
+						chains = jsonObject.getJSONArray("DeneChains");
+						for(int j=0;j<chains.length();j++){
+							jsonObjectChain = chains.getJSONObject(j);
+
+							if(jsonObjectChain.toString().length()>10 && jsonObjectChain.getString("Name").equals(TeleonomeConstants.DENECHAIN_EXTERNAL_DATA)){
+								denes = jsonObjectChain.getJSONArray("Denes");
+
+								for(int k=0;k<denes.length();k++){
+									jsonObjectDene = denes.getJSONObject(k);
+									externalDataDeneName = jsonObjectDene.getString("Name");
+									//
+									// the externalDataDeneName is the name of the External Teleonome
+									// lastPulseExternalTeleonomeJSONObject contains the last pulse
+									// of that teleonome
+									//
+									logger.debug("line 662 Denomemutils, looking for  " + externalDataDeneName);
+									if(publisherTeleonomeName.equals(externalDataDeneName)) {
+								
+										String externalDeneStatus=TeleonomeConstants.EXTERNAL_DATA_STATUS_STALE;
+										Identity denewordStatusIdentity = new Identity(dependentTeleonomeName,TeleonomeConstants.NUCLEI_PURPOSE, TeleonomeConstants.DENECHAIN_EXTERNAL_DATA,publisherTeleonomeName, TeleonomeConstants.EXTERNAL_DATA_STATUS);
+										try {
+											externalDeneStatus = (String) getDeneWordByIdentity(dependentTeleonomePulse, denewordStatusIdentity,  TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+										} catch (InvalidDenomeException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										logger.debug("externalDeneStatus after getting data by pointer " + externalDeneStatus);
+										if(externalDeneStatus.equals(TeleonomeConstants.EXTERNAL_DATA_STATUS_STALE)) {
+											somebodyIsWating=true;
+										}
+										
+									}
+								
+									
+								}
+							}
+						}
+					}
+				}
+				//
+				// now check the mnemosycons of denetype DENE_TYPE_MNEMOSYCON_DENEWORDS_TO_REMEMBER
+				//
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				logger.warn(Utils.getStringException(e));
+			}
+			dependentTeleonomePulse=null;
+			return somebodyIsWating;
+		}
+		
+		public  Object getDeneWordByIdentity(JSONObject dataSource, Identity identity, String whatToBring) throws InvalidDenomeException{
+			JSONArray deneChainsArray=null;
+			Object toReturn=null;
+			try {
+
+				String nucleusName=identity.getNucleusName();
+				String deneChainName=identity.getDenechainName();
+				String deneName=identity.getDeneName();
+				String deneWordName=identity.getDeneWordName();
+				
+				//	//System.out.println("poijbt 1");
+				//
+				// now parse them
+				JSONObject denomeObject = dataSource.getJSONObject("Denome");
+				JSONArray nucleiArray = denomeObject.getJSONArray("Nuclei");
+				String name;
+				JSONObject aJSONObject, internalNucleus = null,purposeNucleus = null,mnemosyneNucleus=null, humanInterfaceNucleus=null;
+				//	//System.out.println("poijbt 2");
+				for(int i=0;i<nucleiArray.length();i++){
+					aJSONObject = (JSONObject) nucleiArray.get(i);
+					name = aJSONObject.getString("Name");
+					if(name.equals(TeleonomeConstants.NUCLEI_INTERNAL)){
+						internalNucleus= aJSONObject;
+						deneChainsArray = internalNucleus.getJSONArray("DeneChains");
+					}else if(name.equals(TeleonomeConstants.NUCLEI_PURPOSE)){
+						purposeNucleus= aJSONObject;
+						deneChainsArray = purposeNucleus.getJSONArray("DeneChains");
+					}else if(name.equals(TeleonomeConstants.NUCLEI_MNEMOSYNE)){
+						mnemosyneNucleus= aJSONObject;
+					}else if(name.equals(TeleonomeConstants.NUCLEI_HUMAN_INTERFACE)){
+						humanInterfaceNucleus= aJSONObject;
+					}
+
+				}
+				//	//System.out.println("poijbt 3");
+				if(nucleusName.equals(TeleonomeConstants.NUCLEI_INTERNAL)){
+					deneChainsArray = internalNucleus.getJSONArray("DeneChains");
+				}else if(nucleusName.equals(TeleonomeConstants.NUCLEI_PURPOSE)){
+					deneChainsArray = purposeNucleus.getJSONArray("DeneChains");
+				}else if(nucleusName.equals(TeleonomeConstants.NUCLEI_MNEMOSYNE)){
+					deneChainsArray = mnemosyneNucleus.getJSONArray("DeneChains");
+				}else if(nucleusName.equals(TeleonomeConstants.NUCLEI_HUMAN_INTERFACE)){
+					deneChainsArray = humanInterfaceNucleus.getJSONArray("DeneChains");
+				}
+				//	//System.out.println("poijbt 4");
+				JSONObject aDeneJSONObject, aDeneWordJSONObject;
+				JSONArray denesJSONArray, deneWordsJSONArray;
+				String valueType, valueInString;
+				Object object;
+				for(int i=0;i<deneChainsArray.length();i++){
+					aJSONObject = (JSONObject) deneChainsArray.get(i);
+					if(aJSONObject.getString("Name").equals(deneChainName)){
+						denesJSONArray = aJSONObject.getJSONArray("Denes");
+						for(int j=0;j<denesJSONArray.length();j++){
+							aDeneJSONObject = (JSONObject) denesJSONArray.get(j);
+							//	//System.out.println("poijbt 5");
+							if(aDeneJSONObject.getString("Name").equals(deneName)){
+								deneWordsJSONArray = aDeneJSONObject.getJSONArray("DeneWords");
+								for(int k=0;k<deneWordsJSONArray.length();k++){
+									
+									aDeneWordJSONObject = (JSONObject) deneWordsJSONArray.get(k);
+									subscriberThreadLogger.debug("aDeneWordJSONObject=" + aDeneWordJSONObject.getString("Name") + " deneWordName=" + deneWordName);
+									if(aDeneWordJSONObject.getString("Name").equals(deneWordName)){
+										//	//System.out.println("poijbt 7");
+										if(whatToBring.equals(TeleonomeConstants.COMPLETE)){
+											toReturn= aDeneWordJSONObject;
+										}else{
+											toReturn= aDeneWordJSONObject.get(whatToBring);
+										}
+									}
+								}
+							}
+						}
+
+					}
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				// TODO Auto-generated catch block
+				Hashtable info = new Hashtable();
+
+				String m = "The denome is not formated Correctly. Error:" + e.getMessage() +" Stacktrace:" + ExceptionUtils.getStackTrace(e);
+				info.put("message", m);
+				throw new InvalidDenomeException(info);
+			}
+			dataSource=null;
+			return toReturn;
+		}
+		
 	}
 	
 	
