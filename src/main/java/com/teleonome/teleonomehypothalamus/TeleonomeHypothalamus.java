@@ -357,11 +357,11 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						//
 						boolean somebodyIsWating = isSomebodyWaitingForMe( aDenomeManager.getDenomeName(), jsonMessage);
 						if(somebodyIsWating) {
-							logger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
+							subscriberThreadLogger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
 							
-							stopExoZeroPublisher();
-							startExoZeroPublisher();
-							subscriberThreadLogger.info( "  restarted the exozero publisher");
+							//stopExoZeroPublisher();
+							//startExoZeroPublisher();
+							//subscriberThreadLogger.info( "  restarted the exozero publisher");
 						}else{
 							subscriberThreadLogger.info(teleonomeName + " is NOT waiting for data from " + aDenomeManager.getDenomeName()  );
 						}
@@ -373,7 +373,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					} catch (InvalidDenomeException e) {
 						subscriberThreadLogger.debug("invalid pulse received from " + teleonomeName + ":" + teleonomeAddress  + " " + contents);
 						// TODO Auto-generated catch block
-						logger.warn(Utils.getStringException(e));
+						subscriberThreadLogger.warn(Utils.getStringException(e));
 					}
 				}else if((learnMyHistory || learnOtherHistory) && topic.startsWith("Remember_")) {
 					try {
