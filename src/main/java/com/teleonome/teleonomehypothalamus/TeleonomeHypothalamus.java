@@ -582,7 +582,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								for(int k=0;k<deneWordsJSONArray.length();k++){
 									
 									aDeneWordJSONObject = (JSONObject) deneWordsJSONArray.get(k);
-									subscriberThreadLogger.debug("aDeneWordJSONObject=" + aDeneWordJSONObject.getString("Name") + " deneWordName=" + deneWordName);
+									//subscriberThreadLogger.debug("aDeneWordJSONObject=" + aDeneWordJSONObject.getString("Name") + " deneWordName=" + deneWordName);
 									if(aDeneWordJSONObject.getString("Name").equals(deneWordName)){
 										//	//System.out.println("poijbt 7");
 										if(whatToBring.equals(TeleonomeConstants.COMPLETE)){
