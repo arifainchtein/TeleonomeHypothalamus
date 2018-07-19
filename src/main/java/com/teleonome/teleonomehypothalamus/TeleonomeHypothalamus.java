@@ -184,13 +184,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 							}
 						}
-
-
-
 					}
 
 					try {
-						Thread.sleep(30000);
+						Thread.sleep(180000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						observerThreadLogger.warn(Utils.getStringException(e));
