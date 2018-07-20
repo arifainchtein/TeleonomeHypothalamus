@@ -298,7 +298,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						 jsonMessage = new JSONObject(contents);
 						 pulseLate = Utils.isPulseLate(jsonMessage);
 						teleonomeNamePulseIsLateIndex.put(teleonomeName, new Boolean(pulseLate));
-						aDenomeManager.updateExternalData(teleonomeName, jsonMessage);
+						
 						
 						
 						// *****************************
@@ -348,7 +348,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							}
 						}
 						//******************************
-						
+						aDenomeManager.updateExternalData(teleonomeName, externalDataLastPulseInfoJSONObject);
 						
 						
 						
