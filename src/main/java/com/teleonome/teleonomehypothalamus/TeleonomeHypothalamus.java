@@ -187,6 +187,14 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					}
 
 					try {
+						//
+						// this sleep is important to the reconnection process
+						// this number has to be large enough for new publishers
+						// start publishing before trying to reconnect
+						// this is because a publisher has to start publishing 
+						// before a subscriber.  so you need to give a failed publisher
+						// time to start publishing and for the subscriber to start
+						// receiving before forcing another reconnection from the subscriber
 						Thread.sleep(10*60*1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -291,8 +299,59 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						 pulseLate = Utils.isPulseLate(jsonMessage);
 						teleonomeNamePulseIsLateIndex.put(teleonomeName, new Boolean(pulseLate));
 						aDenomeManager.updateExternalData(teleonomeName, jsonMessage);
+						
+						
+						// *****************************
+						//
+						// now instead of storing the entire pulse
+						// extract the data that is required for the External Data
+						// and store that
+						ArrayList externalDataLocations = (ArrayList) aDenomeManager.getExternalDataLocations(teleonomeName);
+						String externalDataPointer;
+						Identity externalDataIdentity;
+						Object value;
+						JSONObject externalDataLastPulseInfoJSONObject = new JSONObject();
+						
 						lastPulseTime = jsonMessage.getLong("Pulse Timestamp in Milliseconds");
 						 lastPulseTimestamp = jsonMessage.getString("Pulse Timestamp");
+						 
+						 lastPulseTime = jsonMessage.getLong(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS);
+						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS, lastPulseTime);
+						
+						lastPulseTimestamp = jsonMessage.getString(TeleonomeConstants.PULSE_TIMESTAMP);
+						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_TIMESTAMP, lastPulseTimestamp);
+						
+						Identity externalDataCurrentPulseIdentity = new Identity(teleonomeName,TeleonomeConstants.NUCLEI_PURPOSE, TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA,"Vital",TeleonomeConstants.DENEWORD_TYPE_CURRENT_PULSE_FREQUENCY );
+						Identity numberOfPulseForStaleIdentity = new Identity(teleonomeName,TeleonomeConstants.NUCLEI_INTERNAL, TeleonomeConstants.DENECHAIN_DESCRIPTIVE,TeleonomeConstants.DENE_VITAL,TeleonomeConstants.DENEWORD_TYPE_NUMBER_PULSES_BEFORE_LATE );
+						try{
+						    int externalCurrentPulse = (Integer)getDeneWordByIdentity(jsonMessage, externalDataCurrentPulseIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+						    externalDataLastPulseInfoJSONObject.put(externalDataCurrentPulseIdentity.toString(), externalCurrentPulse);
+							
+						    int numberOfPulseForStale = (Integer)getDeneWordByIdentity(jsonMessage, numberOfPulseForStaleIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+						    externalDataLastPulseInfoJSONObject.put(numberOfPulseForStaleIdentity.toString(), numberOfPulseForStale);
+							
+						}catch(InvalidDenomeException e){
+							logger.warn(Utils.getStringException(e));
+						}
+						if(externalDataLocations!=null) {
+							for(int i=0;i<externalDataLocations.size();i++) {
+								externalDataPointer = (String) externalDataLocations.get(i);
+								externalDataIdentity = new Identity(externalDataPointer);
+								try {
+									value = getDeneWordByIdentity(jsonMessage, externalDataIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+									externalDataLastPulseInfoJSONObject.put(externalDataPointer, value);
+								} catch (InvalidDenomeException e) {
+									// TODO Auto-generated catch block
+									logger.warn(Utils.getStringException(e));
+								}
+
+							}
+						}
+						//******************************
+						
+						
+						
+						
 						 identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_OPERATIONAL_MODE);
 						 statusMessage = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 
@@ -323,7 +382,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						//
 						// now check to see if any words need to be unwrapped
 						String rememberedWordPointer;
-						Object value;
+						
 						String valueType;
 						Hashtable<String,ArrayList> deneWordsToRememberByTeleonome = aDenomeManager.getDeneWordsToRememberByTeleonome();
 						subscriberThreadLogger.debug("deneWordsToRememberByTeleonome " + deneWordsToRememberByTeleonome );
