@@ -25,6 +25,7 @@ import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 
 import com.teleonome.framework.TeleonomeConstants;
+import com.teleonome.framework.denome.DenomeUtils;
 import com.teleonome.framework.denome.Identity;
 import com.teleonome.framework.exception.InvalidDenomeException;
 import com.teleonome.framework.hypothalamus.Hypothalamus;
@@ -300,7 +301,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 					try {
 						 jsonMessage = new JSONObject(contents);
-						 pulseLate = Utils.isPulseLate(jsonMessage);
+						 pulseLate = isPulseLate(jsonMessage);
 						teleonomeNamePulseIsLateIndex.put(teleonomeName, new Boolean(pulseLate));
 						
 						
@@ -688,6 +689,48 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	}
 	
 	
+	public  boolean isPulseLate(JSONObject pulseJSONObject) throws InvalidDenomeException {
+		long lastPulseMillis = pulseJSONObject.getLong(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS);
+		String lastPulseDate = pulseJSONObject.getString(TeleonomeConstants.PULSE_TIMESTAMP);
+		logger.info("lastPulseDate=" + lastPulseDate + " lastPulseMillis=" + lastPulseMillis);
+		JSONObject denomeObject = pulseJSONObject.getJSONObject("Denome");
+		String tN = denomeObject.getString("Name");
+
+
+		Identity identity = new Identity(tN, TeleonomeConstants.NUCLEI_INTERNAL, TeleonomeConstants.DENECHAIN_DESCRIPTIVE, TeleonomeConstants.DENE_VITAL, TeleonomeConstants.DENEWORD_TYPE_NUMBER_PULSES_BEFORE_LATE);
+		int numberOfPulsesBeforeIsLate =  (Integer) DenomeUtils.getDeneWordByIdentity(pulseJSONObject, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+
+		identity = new Identity(tN, TeleonomeConstants.NUCLEI_PURPOSE, TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA, TeleonomeConstants.DENE_VITAL, TeleonomeConstants.DENEWORD_TYPE_CURRENT_PULSE_FREQUENCY);
+		int currentPulseFrequency = (Integer)DenomeUtils.getDeneWordByIdentity(pulseJSONObject, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+
+		identity = new Identity(tN, TeleonomeConstants.NUCLEI_PURPOSE, TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA, TeleonomeConstants.DENE_VITAL, TeleonomeConstants.DENEWORD_TYPE_CURRENT_PULSE_GENERATION_DURATION);
+		int currentPulseGenerationDuration = (Integer)DenomeUtils.getDeneWordByIdentity(pulseJSONObject, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+		logger.info("currentPulseFrequency=" + currentPulseFrequency + " numberOfPulsesBeforeIsLate=" + numberOfPulsesBeforeIsLate);
+
+		long now = System.currentTimeMillis();
+		long timeSinceLastPulse =  now - lastPulseMillis;
+
+		//
+		// There are two cases, depending whether:
+		//
+		// currentPulseFrequency > currentPulseGenerationDuration in this case we are in a teleonome that 
+		// executes a pulse every minute but the creation of the pulse is less than one minute
+		//
+		//currentPulseFrequency < currentPulseGenerationDuration in this case we are in a teleonome that 
+		// takes a long time to complete a pulse cycle.  For example a teleonome that is processing analyticons
+		// or mnemosycons might take 20 minutes to complete the pulse and wait one minute before starting again
+		
+		boolean late=(numberOfPulsesBeforeIsLate*(currentPulseFrequency  + currentPulseGenerationDuration))< timeSinceLastPulse;
+		pulseJSONObject=null;
+		
+//		boolean late=false;
+//		if(currentPulseFrequency > currentPulseGenerationDuration) {
+//			if((numberOfPulsesBeforeIsLate*(currentPulseFrequency  + currentPulseGenerationDuration))< timeSinceLastPulse)late=true;
+//		}else {
+//			if((numberOfPulsesBeforeIsLate*currentPulseGenerationDuration)< timeSinceLastPulse)late=true;
+//		}
+		return late;
+	}
 	
 
 
