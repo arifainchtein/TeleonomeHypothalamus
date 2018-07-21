@@ -1,7 +1,9 @@
 package com.teleonome.teleonomehypothalamus;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -116,10 +118,12 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					observerThreadLogger.debug("teleonomesToReconnect=" + teleonomesToReconnect + " teleonomesToReconnect.size()=" + teleonomesToReconnect.size());
 
 					
-					
+					String notPresentTeleonomeAdress;
 					for(Enumeration<String> en=notPresentTeleonoms.keys();en.hasMoreElements();){
 						teleonomName = (String)en.nextElement();
-						observerThreadLogger.debug("Not Found teleonome " + teleonomName);
+						notPresentTeleonomeAdress = (String)notPresentTeleonoms.get(teleonomName);
+						
+						observerThreadLogger.debug("Not Found teleonome " + teleonomName + " with address " + notPresentTeleonomeAdress);
 						organismViewStatusInfoJSONObject.put(teleonomName,"faded");
 					}
 					publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_STATUS, organismViewStatusInfoJSONObject.toString());
@@ -365,8 +369,23 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						 identityPointer=teleonomeName;
 						 tSatus= teleonomeName + " " +  TeleonomeConstants.EXTERNAL_DATA_STATUS_OK;
 						try {
-							FileUtils.write(new File("pulses/" + teleonomeName + ".pulse"), jsonMessage.toString(4));
-							FileUtils.write(new File("tomcat/webapps/ROOT/" + teleonomeName + ".pulse"), jsonMessage.toString(4));
+					
+							String fileName = "pulses/" + teleonomeName + ".pulse";
+							
+							BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+							String str = jsonMessage.toString(4);
+						    writer.write(str);
+						    writer.close();
+						    
+						    fileName = "tomcat/webapps/ROOT/" + teleonomeName + ".pulse";
+						    writer = new BufferedWriter(new FileWriter(fileName));
+							writer.write(str);
+						    writer.close();
+						    
+						    
+						    
+							//FileUtils.write(new File("pulses/" + teleonomeName + ".pulse"), );
+							//FileUtils.write(new File("tomcat/webapps/ROOT/" + teleonomeName + ".pulse"), jsonMessage.toString(4));
 
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
