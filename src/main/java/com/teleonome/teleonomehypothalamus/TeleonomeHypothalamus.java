@@ -501,7 +501,13 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				}
 				jsonMessage=null;
 				contents=null;
+				double availableMemory = Runtime.getRuntime().freeMemory()/1024000;
+				
 				System.gc();
+				double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
+
+				logger.info("Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+
 			}
 		}
 		
