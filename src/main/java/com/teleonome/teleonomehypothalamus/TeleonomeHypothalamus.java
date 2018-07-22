@@ -5,6 +5,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryType;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -507,6 +510,11 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
 
 				logger.info("Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+				for (MemoryPoolMXBean mpBean: ManagementFactory.getMemoryPoolMXBeans()) {
+				    if (mpBean.getType() == MemoryType.HEAP) {
+				    	logger.info("Name:" + mpBean.getName() + " " +  mpBean.getUsage());
+				    }
+				}
 
 			}
 		}
