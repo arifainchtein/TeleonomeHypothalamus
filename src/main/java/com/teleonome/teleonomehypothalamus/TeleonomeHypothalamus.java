@@ -179,7 +179,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								observerThreadLogger.debug("teleonomName=" + teleonomName + " teleonomesToReconnect.contains(teleonomName)=" + teleonomesToReconnect.contains(teleonomName));
 
 								if(teleonomesToReconnect.contains(teleonomName)){
-									subscriberList.remove(teleonomAddress);
+									subscriber = (Socket) subscriberList.remove(teleonomAddress);
 									subscriber=null;
 									observerThreadLogger.debug(teleonomName + " with ip " +teleonomAddress + " needs to reconnect");
 
