@@ -313,6 +313,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 				//	if(teleonomeName.equals("Ra")){
 				long lastPulseTime=0;
+				int lastPulseCreationDurationMillis=0;
 				if(topic.equals("Status")) {
 
 					try {
@@ -342,6 +343,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						lastPulseTimestamp = jsonMessage.getString(TeleonomeConstants.PULSE_TIMESTAMP);
 						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_TIMESTAMP, lastPulseTimestamp);
 						
+						lastPulseCreationDurationMillis = jsonMessage.getInt(TeleonomeConstants.PULSE_CREATION_DURATION_MILLIS);
+						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_CREATION_DURATION_MILLIS, lastPulseCreationDurationMillis);
+						
+							
 						Identity externalDataCurrentPulseIdentity = new Identity(teleonomeName,TeleonomeConstants.NUCLEI_PURPOSE, TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA,"Vital",TeleonomeConstants.DENEWORD_TYPE_CURRENT_PULSE_FREQUENCY );
 						Identity numberOfPulseForStaleIdentity = new Identity(teleonomeName,TeleonomeConstants.NUCLEI_INTERNAL, TeleonomeConstants.DENECHAIN_DESCRIPTIVE,TeleonomeConstants.DENE_VITAL,TeleonomeConstants.DENEWORD_TYPE_NUMBER_PULSES_BEFORE_LATE );
 						try{
