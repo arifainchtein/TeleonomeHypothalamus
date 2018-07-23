@@ -72,7 +72,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	class ObserverThread extends Thread{
 		JmDNS mdnsServer;
 		int subscriberThreadCounter=0;
-		
+		Hashtable teleonomeNameSubscriberThreadIdex = new Hashtable();
 		String thisTeleonomeName;
 		String thisTeleonomAddress;
 		public ObserverThread(){
@@ -159,6 +159,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							if(subscriber==null){
 								aSubscriberThread = new SubscriberThread(teleonomAddress, teleonomName);
 								aSubscriberThread.start();
+								teleonomeNameSubscriberThreadIdex.put(teleonomName, aSubscriberThread);
 								subscriberThreadCounter++;
 								observerThreadLogger.debug("after creating subscriber subscriberThreadCounter=" + subscriberThreadCounter);
 
@@ -182,11 +183,13 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									subscriber = (Socket) subscriberList.remove(teleonomAddress);
 									subscriber=null;
 									observerThreadLogger.debug(teleonomName + " with ip " +teleonomAddress + " needs to reconnect");
-
+									SubscriberThread oldSubscriberThread = (SubscriberThread) teleonomeNameSubscriberThreadIdex.get(teleonomName);
+									oldSubscriberThread=null;
 									teleonomesToReconnect.remove(teleonomName);
 									logger.debug("after removing " + teleonomName +" teleonomesToReconnect="+ teleonomesToReconnect.size());
 									aSubscriberThread = new SubscriberThread(teleonomAddress, teleonomName);
 									aSubscriberThread.start();
+									teleonomeNameSubscriberThreadIdex.put(teleonomName, aSubscriberThread);
 
 								}
 
