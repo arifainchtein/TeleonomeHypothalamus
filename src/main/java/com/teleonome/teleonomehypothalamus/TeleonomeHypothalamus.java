@@ -184,13 +184,18 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									subscriber=null;
 									observerThreadLogger.debug(teleonomName + " with ip " +teleonomAddress + " needs to reconnect");
 									SubscriberThread oldSubscriberThread = (SubscriberThread) teleonomeNameSubscriberThreadIdex.get(teleonomName);
+									oldSubscriberThread.setKeepGoing(false);
 									oldSubscriberThread=null;
 									teleonomesToReconnect.remove(teleonomName);
 									logger.debug("after removing " + teleonomName +" teleonomesToReconnect="+ teleonomesToReconnect.size());
 									aSubscriberThread = new SubscriberThread(teleonomAddress, teleonomName);
 									aSubscriberThread.start();
 									teleonomeNameSubscriberThreadIdex.put(teleonomName, aSubscriberThread);
-
+									
+									double availableMemory = Runtime.getRuntime().freeMemory()/1024000;									
+									System.gc();
+									double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
+									logger.info("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
 								}
 
 							}
@@ -224,7 +229,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 		Socket subscriber;
 		JSONObject whoAmI=null;
 		JSONObject howAmI=null;
-		
+		boolean keepGoing=true;
 		String topic;
 		Vector externalTeleonomeNamesVector;
 		public SubscriberThread(String t, String n){
@@ -244,6 +249,11 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			subscriberThreadLogger.debug("externalTeleonomeNamesVector=" + externalTeleonomeNamesVector);
 		}
 
+		public void setKeepGoing(boolean b) {
+			keepGoing=b;
+			subscriberThreadLogger.debug("setting keepGoing  to " + keepGoing);
+		}
+		
 		public void run(){
 			boolean learnMyHistory=false;
 			Boolean B;
@@ -266,7 +276,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			Identity learnMyHistoryDeneActiveIdentity;
 			
 			
-			while(true){
+			while(keepGoing){
 				JSONObject jsonMessage = null;
 				topic = subscriber.recvStr ().trim();
 				String contents = subscriber.recvStr ().trim();
@@ -520,6 +530,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				}
 
 			}
+			subscriberThreadLogger.debug("Existing thread");
 		}
 		
 		
