@@ -128,6 +128,22 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						notPresentTeleonomeAdress = (String)notPresentTeleonoms.get(teleonomName);
 						
 						observerThreadLogger.debug("Not Found teleonome " + teleonomName + " with address " + notPresentTeleonomeAdress);
+						
+						
+						SubscriberThread anOldSubscriberThread = (SubscriberThread) teleonomeNameSubscriberThreadIdex.get(teleonomName);
+						anOldSubscriberThread=null;
+						subscriber = (Socket)subscriberList.get(notPresentTeleonomeAdress);
+						if(subscriber!=null) {
+							subscriberList.remove(notPresentTeleonomeAdress);
+							subscriber=null;
+						}
+						double availableMemory = Runtime.getRuntime().freeMemory()/1024000;									
+						System.gc();
+						double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
+						logger.info("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+					
+						
+						
 						organismViewStatusInfoJSONObject.put(teleonomName,"faded");
 					}
 					publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_STATUS, organismViewStatusInfoJSONObject.toString());
@@ -149,6 +165,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						if(!thisTeleonomeName.equals(teleonomName)) {
 							teleonomAddress = (String)presentTeleonoms.get(teleonomName);					
 
+							
+							
 							 status = TeleonomeConstants.TELEONOME_STATUS_DISCOVERED;
 							 operationMode=TeleonomeConstants.TELEONOME_OPERATION_MODE_UNKNOWN;
 							 identity = TeleonomeConstants.TELEONOME_IDENTITY_ORGANISM;
@@ -232,6 +250,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 		boolean keepGoing=true;
 		String topic;
 		Vector externalTeleonomeNamesVector;
+		long lastPulseTime=0;
+		String lastPulseTimestamp = "";
+		
 		public SubscriberThread(String t, String n){
 			teleonomeAddress=t;
 			teleonomeName=n;
@@ -254,6 +275,15 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			subscriberThreadLogger.debug("setting keepGoing  to " + keepGoing);
 		}
 		
+		
+		public long getLastPulseTime() {
+			return lastPulseTime;
+		}
+		
+		public String getLastPulseTimestamp() {
+			return lastPulseTimestamp;
+		}
+		
 		public void run(){
 			boolean learnMyHistory=false;
 			Boolean B;
@@ -264,7 +294,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			
 			boolean pulseLate = false;
 			
-			String lastPulseTimestamp = "";
+			
 			Identity identity = null;
 			String statusMessage = "";
 			String bootstrapStatus = "";
@@ -312,7 +342,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 
 				//	if(teleonomeName.equals("Ra")){
-				long lastPulseTime=0;
+				
 				int lastPulseCreationDurationMillis=0;
 				if(topic.equals("Status")) {
 
@@ -334,8 +364,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						Object value;
 						JSONObject externalDataLastPulseInfoJSONObject = new JSONObject();
 						
-						lastPulseTime = jsonMessage.getLong("Pulse Timestamp in Milliseconds");
-						 lastPulseTimestamp = jsonMessage.getString("Pulse Timestamp");
+						 lastPulseTimestamp = jsonMessage.getString(TeleonomeConstants.PULSE_TIMESTAMP);
 						 
 						 lastPulseTime = jsonMessage.getLong(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS);
 						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS, lastPulseTime);
