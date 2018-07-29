@@ -112,7 +112,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			Hashtable notPresentTeleonoms;
 			String status=null;
 			String operationMode=null;
-			String identity;
+			String identity, teleonomeName, teleonomeAddress;
 			
 			do{
 				try {
@@ -120,7 +120,14 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					 notPresentTeleonoms = aDiscoverTeleonoms.getNotPresentTeleonoms();
 					observerThreadLogger.debug("there are notPresentTeleonoms=" + notPresentTeleonoms.size());
 					observerThreadLogger.debug("teleonomesToReconnect=" + teleonomesToReconnect + " teleonomesToReconnect.size()=" + teleonomesToReconnect.size());
-
+					
+					for(int i=0;i<teleonomesToReconnect.size();i++) {
+						teleonomeName = (String) teleonomesToReconnect.get(i);
+						 teleonomeAddress = (String) subscriberListByName.get(teleonomeName);
+						 observerThreadLogger.debug("teleonomesToReconnect   " + teleonomeName + "  with address " + teleonomeAddress);
+							
+					}
+					
 					
 					String notPresentTeleonomeAdress;
 					for(Enumeration<String> en=notPresentTeleonoms.keys();en.hasMoreElements();){
@@ -262,6 +269,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			subscriber.connect("tcp://"+ teleonomeAddress +":5563"); 
 			subscriberThreadLogger.debug("subscribed to " + teleonomeName + ":" + teleonomeAddress);
 			subscriberList.put(teleonomeAddress, subscriber);
+			subscriberListByName.put(teleonomeName,teleonomeAddress);
 			subscriber.subscribe("Status".getBytes()); 
 			subscriber.subscribe(("Remember_" + aDenomeManager.getDenomeName()).getBytes()); 
 
