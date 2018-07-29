@@ -124,6 +124,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 					for(int i=0;i<teleonomesToReconnect.size();i++) {
 						teleonomeName = (String) teleonomesToReconnect.get(i);
 						 teleonomeAddress = (String) subscriberListByName.get(teleonomeName);
+						 
 						 observerThreadLogger.debug("teleonomesToReconnect   " + teleonomeName + "  with address " + teleonomeAddress);
 							
 					}
@@ -159,7 +160,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						teleonomAddress = (String)en.nextElement();
 						subscriber=(Socket)subscriberList.get(teleonomAddress );
 						if(subscriber!=null) {
-							observerThreadLogger.debug("in observer thread teleonomAddress=" + teleonomAddress + " has a subscriber connected");
+							teleonomeName = (String) subscriberListByAddress.get(teleonomAddress);
+							observerThreadLogger.debug("in observer thread " + teleonomeName + "with teleonomAddress=" + teleonomAddress + " has a subscriber connected");
 
 						}
 
@@ -270,6 +272,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			subscriberThreadLogger.debug("subscribed to " + teleonomeName + ":" + teleonomeAddress);
 			subscriberList.put(teleonomeAddress, subscriber);
 			subscriberListByName.put(teleonomeName,teleonomeAddress);
+			subscriberListByAddress.put(teleonomeAddress,teleonomeName);
 			subscriber.subscribe("Status".getBytes()); 
 			subscriber.subscribe(("Remember_" + aDenomeManager.getDenomeName()).getBytes()); 
 
