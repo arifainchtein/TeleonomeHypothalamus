@@ -85,7 +85,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				// Register a test service.
 				ServiceInfo testService = ServiceInfo.create(bonjourServiceType, hostName, 6666, "Teleonome service");
 				mdnsServer.registerService(testService);
-				logger.info("created teleonome service");
+				logger.debug("created teleonome service");
 				thisTeleonomeName = aDenomeManager.getDenomeName();
 				
 								
@@ -148,7 +148,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						double availableMemory = Runtime.getRuntime().freeMemory()/1024000;									
 						System.gc();
 						double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
-						logger.info("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+						logger.debug("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
 					
 						
 						
@@ -222,7 +222,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									double availableMemory = Runtime.getRuntime().freeMemory()/1024000;									
 									System.gc();
 									double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
-									logger.info("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+									logger.debug("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
 								}
 
 							}
@@ -494,13 +494,13 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						//
 						boolean somebodyIsWating = isSomebodyWaitingForMe( aDenomeManager.getDenomeName(), jsonMessage);
 						if(somebodyIsWating) {
-							subscriberThreadLogger.info(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
+							subscriberThreadLogger.debug(teleonomeName + " is waiting for data from " + aDenomeManager.getDenomeName() + " restarting the exozero publisher");
 							
 							//stopExoZeroPublisher();
 							//startExoZeroPublisher();
-							//subscriberThreadLogger.info( "  restarted the exozero publisher");
+							//subscriberThreadLogger.debug( "  restarted the exozero publisher");
 						}else{
-							subscriberThreadLogger.info(teleonomeName + " is NOT waiting for data from " + aDenomeManager.getDenomeName()  );
+							subscriberThreadLogger.debug(teleonomeName + " is NOT waiting for data from " + aDenomeManager.getDenomeName()  );
 						}
 						
 						
@@ -567,10 +567,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				System.gc();
 				double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
 
-				logger.info("Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+				logger.debug("Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
 				for (MemoryPoolMXBean mpBean: ManagementFactory.getMemoryPoolMXBeans()) {
 				    if (mpBean.getType() == MemoryType.HEAP) {
-				    	logger.info("Name:" + mpBean.getName() + " " +  mpBean.getUsage());
+				    	logger.debug("Name:" + mpBean.getName() + " " +  mpBean.getUsage());
 				    }
 				}
 
@@ -765,7 +765,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	public  boolean isPulseLate(JSONObject pulseJSONObject) throws InvalidDenomeException {
 		long lastPulseMillis = pulseJSONObject.getLong(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS);
 		String lastPulseDate = pulseJSONObject.getString(TeleonomeConstants.PULSE_TIMESTAMP);
-		logger.info("lastPulseDate=" + lastPulseDate + " lastPulseMillis=" + lastPulseMillis);
+		logger.debug("lastPulseDate=" + lastPulseDate + " lastPulseMillis=" + lastPulseMillis);
 		JSONObject denomeObject = pulseJSONObject.getJSONObject("Denome");
 		String tN = denomeObject.getString("Name");
 
@@ -778,7 +778,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 		identity = new Identity(tN, TeleonomeConstants.NUCLEI_PURPOSE, TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA, TeleonomeConstants.DENE_VITAL, TeleonomeConstants.DENEWORD_TYPE_CURRENT_PULSE_GENERATION_DURATION);
 		int currentPulseGenerationDuration = (Integer)DenomeUtils.getDeneWordByIdentity(pulseJSONObject, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
-		logger.info("currentPulseFrequency=" + currentPulseFrequency + " numberOfPulsesBeforeIsLate=" + numberOfPulsesBeforeIsLate);
+		logger.debug("currentPulseFrequency=" + currentPulseFrequency + " numberOfPulsesBeforeIsLate=" + numberOfPulsesBeforeIsLate);
 
 		long now = System.currentTimeMillis();
 		long timeSinceLastPulse =  now - lastPulseMillis;
