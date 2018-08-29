@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -80,8 +81,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 
 			try {
-				observerThreadLogger.info("about to create teleonome service");
-				mdnsServer = JmDNS.create(getIpAddress());
+				InetAddress inetAddress = getIpAddress();
+				observerThreadLogger.info("about to create teleonome service with inetAddress=" + inetAddress.getHostAddress());
+				mdnsServer = JmDNS.create(inetAddress);
 				// Register a test service.
 				ServiceInfo testService = ServiceInfo.create(bonjourServiceType, hostName, 6666, "Teleonome service");
 				mdnsServer.registerService(testService);
@@ -461,10 +463,83 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						}
 						
 						//
-						// now check to see if any words need to be unwrapped
-						String rememberedWordPointer;
+						// now check to see if any chains or words need to be unwrapped
+						// first do the chains
+						//
+						Hashtable<String,ArrayList> deneChainsToRememberByTeleonome = aDenomeManager.getDeneChainsToRememberByTeleonome();
+						String rememberedeneChainPointer;
 						
 						String valueType;
+						TimeZone timeZone = aDenomeManager.getTeleonomeTimeZone();
+						ArrayList teleonomeRememberedDeneChainsArrayList = deneChainsToRememberByTeleonome.get(teleonomeName);
+						subscriberThreadLogger.debug("for " + teleonomeName + " teleonomeRememberedDeneChainsArrayList: " + teleonomeRememberedDeneChainsArrayList );
+						
+						if(teleonomeRememberedDeneChainsArrayList!=null && teleonomeRememberedDeneChainsArrayList.size()>0) {
+							Identity deneChainIdentity;
+							for( int i=0;i<teleonomeRememberedDeneChainsArrayList.size();i++) {
+								
+								rememberedeneChainPointer = (String) teleonomeRememberedDeneChainsArrayList.get(i);	
+								deneChainIdentity = new Identity(rememberedeneChainPointer);
+								JSONObject deneChainJSONObject = aDenomeManager.getDeneChainByIdentity(deneChainIdentity);
+								Hashtable toReturn = new Hashtable();
+								JSONArray denes = deneChainJSONObject.getJSONArray("Denes");
+								JSONObject dene, deneWord;
+								JSONArray deneWords;
+								boolean b;
+								Identity includedRememberedIdentity;
+								for(int l=0;l<denes.length();l++) {
+									dene = (JSONObject)denes.get(l);
+									deneWords = dene.getJSONArray("DeneWords");
+									for(int j=0;j<deneWords.length();j++) {
+										deneWord = (JSONObject)deneWords.get(j);
+										includedRememberedIdentity = new Identity(deneChainIdentity.getTeleonomeName(), deneChainIdentity.getNucleusName(), deneChainIdentity.getDenechainName(), dene.getString(TeleonomeConstants.DENE_DENE_NAME_ATTRIBUTE),deneWord.getString(TeleonomeConstants.DENEWORD_NAME_ATTRIBUTE));
+										value = getDeneWordByIdentity(jsonMessage,includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+										valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+										subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
+										aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+									}
+								}
+							}
+						}
+						//
+						// now do the denes
+						//
+						//
+						// now check to see if any chains or words need to be unwrapped
+						// first do the chains
+						//
+						Hashtable<String,ArrayList> denesToRememberByTeleonome = aDenomeManager.getDenesToRememberByTeleonome();
+						String rememberedenePointer;
+						
+						ArrayList teleonomeRememberedDenesArrayList = denesToRememberByTeleonome.get(teleonomeName);
+						subscriberThreadLogger.debug("for " + teleonomeName + " teleonomeRememberedDenesArrayList: " + teleonomeRememberedDenesArrayList );
+						
+						if(teleonomeRememberedDenesArrayList!=null && teleonomeRememberedDenesArrayList.size()>0) {
+							Identity deneIdentity;
+							for( int i=0;i<teleonomeRememberedDenesArrayList.size();i++) {
+								
+								rememberedenePointer = (String) teleonomeRememberedDenesArrayList.get(i);	
+								deneIdentity = new Identity(rememberedenePointer);
+								JSONObject deneJSONObject = aDenomeManager.getDeneByIdentity(deneIdentity);
+								Hashtable toReturn = new Hashtable();
+								JSONArray deneWords = deneJSONObject.getJSONArray("DeneWords");
+								JSONObject dene, deneWord;
+								boolean b;
+								Identity includedRememberedIdentity;
+								for(int j=0;j<deneWords.length();j++) {
+									deneWord = (JSONObject)deneWords.get(j);
+									includedRememberedIdentity = new Identity(deneIdentity.getTeleonomeName(), deneIdentity.getNucleusName(), deneIdentity.getDenechainName(), deneJSONObject.getString(TeleonomeConstants.DENE_DENE_NAME_ATTRIBUTE),deneWord.getString(TeleonomeConstants.DENEWORD_NAME_ATTRIBUTE));
+									value = getDeneWordByIdentity(jsonMessage,includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+									valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+									subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
+									aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+								}
+								
+							}
+						}
+						
+						String rememberedWordPointer;
+						
 						Hashtable<String,ArrayList> deneWordsToRememberByTeleonome = aDenomeManager.getDeneWordsToRememberByTeleonome();
 						subscriberThreadLogger.debug("deneWordsToRememberByTeleonome " + deneWordsToRememberByTeleonome );
 						
@@ -472,7 +547,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						subscriberThreadLogger.debug("for " + teleonomeName + " teleonomeRememberedWordsArrayList: " + teleonomeRememberedWordsArrayList );
 						
 						if(teleonomeRememberedWordsArrayList!=null && teleonomeRememberedWordsArrayList.size()>0) {
-							TimeZone timeZone = aDenomeManager.getTeleonomeTimeZone();
+							
 							for( int i=0;i<teleonomeRememberedWordsArrayList.size();i++) {
 								rememberedWordPointer = (String) teleonomeRememberedWordsArrayList.get(i);
 								value = getDeneWordByIdentity(jsonMessage,new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
