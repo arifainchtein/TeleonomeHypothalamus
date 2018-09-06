@@ -9,6 +9,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -58,10 +60,24 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			// TODO Auto-generated catch block
 			logger.warn(Utils.getStringException(e1));
 		}
-
-		ObserverThread o = new ObserverThread();
-		o.start();
-
+		//
+		// only start the observer thread if
+		// we are in organu=ism mode,
+		// if we are in host mode, dont start it
+		InetAddress exoZeroInetAddress=null;
+		try {
+			exoZeroInetAddress = Utils.getExoZeroNetworkAddress();
+		} catch (SocketException | UnknownHostException e) {
+			// TODO Auto-generated catch block
+			logger.warn(Utils.getStringException(e));
+		}
+		//
+		// if the teleonome has only one network card and it is set 
+		// to host, then exoZeroInetAddress will be null
+		if(exoZeroInetAddress!=null) {
+			ObserverThread o = new ObserverThread();
+			o.start();
+		}
 
 		aPulseThread.start();
 
