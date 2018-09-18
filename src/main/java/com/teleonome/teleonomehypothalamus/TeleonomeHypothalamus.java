@@ -88,7 +88,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 	class ObserverThread extends Thread{
 		JmDNS mdnsServer;
-		int subscriberThreadCounter=0;
+		
 		Hashtable teleonomeNameSubscriberThreadIdex = new Hashtable();
 		String thisTeleonomeName;
 		String thisTeleonomAddress;
@@ -179,7 +179,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						subscriber=(Socket)subscriberList.get(teleonomAddress );
 						if(subscriber!=null) {
 							teleonomeName = (String) subscriberListByAddress.get(teleonomAddress);
-							observerThreadLogger.debug("in observer thread " + teleonomeName + "with teleonomAddress=" + teleonomAddress + " has a subscriber connected");
+							observerThreadLogger.debug("in observer thread " + teleonomeName + " with teleonomAddress=" + teleonomAddress + " has a subscriber connected");
 
 						}
 
@@ -202,11 +202,20 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 							observerThreadLogger.debug("in observer thread teleonomName=" + teleonomName + " teleonomAddress=" + teleonomAddress + " subscriber=" + subscriber );
 
 							if(subscriber==null){
+								
+								SubscriberThread oldSubscriberThread = (SubscriberThread) teleonomeNameSubscriberThreadIdex.get(teleonomName);
+								if(oldSubscriberThread!=null) {
+									oldSubscriberThread.setKeepGoing(false);
+									oldSubscriberThread=null;
+								}
+								
+								
+								
 								aSubscriberThread = new SubscriberThread(teleonomAddress, teleonomName);
 								aSubscriberThread.start();
 								teleonomeNameSubscriberThreadIdex.put(teleonomName, aSubscriberThread);
-								subscriberThreadCounter++;
-								observerThreadLogger.debug("after creating subscriber subscriberThreadCounter=" + subscriberThreadCounter);
+								//subscriberThreadCounter++;
+								observerThreadLogger.debug("after creating subscriber subscriberThreadCounter=" + teleonomeNameSubscriberThreadIdex.size());
 
 								if(teleonomesToReconnect.contains(teleonomName)){
 									teleonomesToReconnect.remove(teleonomName);
@@ -236,11 +245,11 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									aSubscriberThread = new SubscriberThread(teleonomAddress, teleonomName);
 									aSubscriberThread.start();
 									teleonomeNameSubscriberThreadIdex.put(teleonomName, aSubscriberThread);
-									
+									logger.debug("after creating new subscriber thread for " + teleonomName +" teleonomeNameSubscriberThreadIdex="+ teleonomeNameSubscriberThreadIdex.size());
 									double availableMemory = Runtime.getRuntime().freeMemory()/1024000;									
 									System.gc();
 									double afterGcMemory = Runtime.getRuntime().freeMemory()/1024000;
-									logger.debug("After rereshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
+									logger.debug("After refreshing subscriber thread Memory Status, before gc=" + availableMemory + " after gc=" + afterGcMemory);
 								}
 
 							}
@@ -604,15 +613,15 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						subscriberThreadLogger.warn(Utils.getStringException(e));
 					}
 				}else if((learnMyHistory || learnOtherHistory) && topic.startsWith("Remember_")) {
-					try {
-						jsonMessage = new JSONObject(contents);
-						lastPulseTime = jsonMessage.getLong("Pulse Timestamp in Milliseconds");
-
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						subscriberThreadLogger.warn(Utils.getStringException(e));
-
-					}
+//					try {
+//						jsonMessage = new JSONObject(contents);
+//						lastPulseTime = jsonMessage.getLong("Pulse Timestamp in Milliseconds");
+//
+//					} catch (JSONException e) {
+//						// TODO Auto-generated catch block
+//						subscriberThreadLogger.warn(Utils.getStringException(e));
+//
+//					}
 					if((learnMyHistory && topic.equals("Remember_" + aDenomeManager.getDenomeName()))) {
 						//
 						// if we are here we are remembering data about this telenome that
