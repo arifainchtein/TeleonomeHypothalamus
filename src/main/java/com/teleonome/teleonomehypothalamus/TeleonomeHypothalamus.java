@@ -17,6 +17,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
@@ -34,6 +38,7 @@ import com.teleonome.framework.TeleonomeConstants;
 import com.teleonome.framework.denome.DenomeUtils;
 import com.teleonome.framework.denome.Identity;
 import com.teleonome.framework.exception.InvalidDenomeException;
+import com.teleonome.framework.exception.InvalidMutation;
 import com.teleonome.framework.hypothalamus.Hypothalamus;
 import com.teleonome.framework.hypothalamus.PulseThread;
 import com.teleonome.framework.network.NetworkUtilities;
@@ -79,6 +84,31 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			o.start();
 		}
 
+		
+		try {
+			executeTimeBasedMutations();
+		} catch (InvalidMutation | InvalidDenomeException e) {
+			// TODO Auto-generated catch block
+			logger.warn(Utils.getStringException(e));
+		}
+			
+		
+//		ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+//		ses.scheduleAtFixedRate(new Runnable() {
+//		    @Override
+//		    public void run() {
+//		    	logger.info("about to execute TimeBasedMutations");
+//		    	performTimePrunningAnalysis=true;
+//		    	
+//		    	try {
+//					executeTimeBasedMutations();
+//				} catch (InvalidMutation | InvalidDenomeException e) {
+//					// TODO Auto-generated catch block
+//					logger.warn(Utils.getStringException(e));
+//				}
+//		    	//aMnemosyneManager.performTimePrunningAnalysis();
+//		    }
+//		}, 0, 1, TimeUnit.MINUTES);
 		aPulseThread.start();
 
 
@@ -529,10 +559,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						//
 						// now do the denes
 						//
-						//
-						// now check to see if any chains or words need to be unwrapped
-						// first do the chains
-						//
+						
 						Hashtable<String,ArrayList> denesToRememberByTeleonome = aDenomeManager.getDenesToRememberByTeleonome();
 						String rememberedenePointer;
 						
@@ -562,6 +589,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								
 							}
 						}
+						
+						//
+						// now do the denewords
+						//
 						
 						String rememberedWordPointer;
 						
