@@ -552,7 +552,12 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 										value = getDeneWordByIdentity(jsonMessage,includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 										valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 										subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
-										aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+										if(value!=null && valueType!=null) {
+											aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+										}else {
+											subscriberThreadLogger.warn("Unwrap of " + teleonomeName + " FAILED because value:" + value  + " and valueType=" + valueType);
+											
+										}
 									}
 								}
 							}
@@ -585,7 +590,12 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									value = getDeneWordByIdentity(jsonMessage,includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 									valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 									subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
-									aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+									if(value!=null && valueType!=null) {
+										aMnemosyneManager.unwrap(timeZone, teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+									}else {
+										subscriberThreadLogger.warn("Unwrap of " + includedRememberedIdentity.toString() + " FAILED because value:" + value  + " and valueType=" + valueType);
+										
+									}
 								}
 								
 							}
