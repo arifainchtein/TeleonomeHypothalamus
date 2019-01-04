@@ -71,7 +71,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 		// if we are in host mode, dont start it
 		InetAddress exoZeroInetAddress=null;
 		try {
-			exoZeroInetAddress = Utils.getExoZeroNetworkAddress();
+			exoZeroInetAddress = NetworkUtilities.getExoZeroNetworkAddress();
 		} catch (SocketException | UnknownHostException e) {
 			// TODO Auto-generated catch block
 			logger.warn(Utils.getStringException(e));
@@ -515,7 +515,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						// check to see if this teleonome persist organism pulse
 						//
 						if(aPulseThread.isPersistenceOrganismPulses()) {
-							aDBManager.storeOrganismPulse(teleonomeName,localIpAddress,contents,tSatus,  operationMode,  identityPointer, lastPulseTime);	
+							aDBManager.storeOrganismPulse(teleonomeName,teleonomeAddress,contents,tSatus,  operationMode,  identityPointer, lastPulseTime);	
 						}
 						
 						//
@@ -696,7 +696,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								 identityPointer=teleonomeName;
 								 tSatus= teleonomeName + " " +  TeleonomeConstants.EXTERNAL_DATA_STATUS_OK;
 								if(!aDBManager.containsOrganismPulse(lastPulseTime, learnOtherHistoryTeleonomeName)) {
-									aDBManager.storeOrganismPulse(teleonomeName,localIpAddress,contents,tSatus,  operationMode,  identityPointer, lastPulseTime);
+									aDBManager.storeOrganismPulse(teleonomeName,teleonomeAddress,contents,tSatus,  operationMode,  identityPointer, lastPulseTime);
 									aDBManager.storeRemembered(lastPulseTime,"Organism", teleonomeName, teleonomeAddress,learnOtherHistoryTeleonomeName);
 								}
 							} catch (InvalidDenomeException e) {
