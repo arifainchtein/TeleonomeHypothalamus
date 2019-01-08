@@ -553,7 +553,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 										valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 										subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
 										if(value!=null && valueType!=null) {
-											aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+											aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE);			
 										}else {
 											subscriberThreadLogger.warn("Unwrap of " + teleonomeName + " FAILED because value:" + value  + " and valueType=" + valueType);
 											
@@ -591,7 +591,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 									subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
 									if(value!=null && valueType!=null) {
-										aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value);			
+										aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE);			
 									}else {
 										subscriberThreadLogger.warn("Unwrap of " + includedRememberedIdentity.toString() + " FAILED because value:" + value  + " and valueType=" + valueType);
 										
@@ -621,7 +621,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								valueType = (String) getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value  + " and valueType=" + valueType);
 								if(value!=null && valueType!=null) {
-									aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value);
+									aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE);
 								}else {
 									subscriberThreadLogger.warn("Unwrap of " + rememberedWordPointer + " FAILED because value:" + value  + " and valueType=" + valueType);
 									
