@@ -434,11 +434,8 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						JSONObject externalDataLastPulseInfoJSONObject = new JSONObject();
 						
 						 lastPulseTimestamp = jsonMessage.getString(TeleonomeConstants.PULSE_TIMESTAMP);
-						 
 						 lastPulseTime = jsonMessage.getLong(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS);
 						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS, lastPulseTime);
-						
-						lastPulseTimestamp = jsonMessage.getString(TeleonomeConstants.PULSE_TIMESTAMP);
 						externalDataLastPulseInfoJSONObject.put(TeleonomeConstants.PULSE_TIMESTAMP, lastPulseTimestamp);
 						
 						lastPulseCreationDurationMillis = jsonMessage.getInt(TeleonomeConstants.PULSE_CREATION_DURATION_MILLIS);
@@ -462,8 +459,16 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								externalDataPointer = (String) externalDataLocations.get(i);
 								externalDataIdentity = new Identity(externalDataPointer);
 								try {
-									value = getDeneWordByIdentity(jsonMessage, externalDataIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
-									externalDataLastPulseInfoJSONObject.put(externalDataPointer, value);
+									if(externalDataPointer.equals((new Identity(teleonomeName, TeleonomeConstants.PULSE_TIMESTAMP_MILLISECONDS)).toString())) {
+										externalDataLastPulseInfoJSONObject.put(externalDataPointer, lastPulseTime);
+									}else if(externalDataPointer.equals((new Identity(teleonomeName, TeleonomeConstants.PULSE_TIMESTAMP)).toString())) {
+										externalDataLastPulseInfoJSONObject.put(externalDataPointer, lastPulseTimestamp);
+									}else {
+										value = getDeneWordByIdentity(jsonMessage, externalDataIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
+										externalDataLastPulseInfoJSONObject.put(externalDataPointer, value);
+									}
+									
+									
 								} catch (InvalidDenomeException e) {
 									// TODO Auto-generated catch block
 									logger.warn(Utils.getStringException(e));
