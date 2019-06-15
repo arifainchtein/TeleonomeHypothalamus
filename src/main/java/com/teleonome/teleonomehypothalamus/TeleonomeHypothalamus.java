@@ -627,7 +627,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								value = getDeneWordByIdentity(jsonMessage,new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 								valueType = (String) getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
 								units = (String) getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_UNIT_ATTRIBUTE);
-								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value  + " and valueType=" + valueType);
+								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with units=" + units + " value:" + value  + " and valueType=" + valueType);
 								if(value!=null && valueType!=null) {
 									aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE, units);
 								}else {
