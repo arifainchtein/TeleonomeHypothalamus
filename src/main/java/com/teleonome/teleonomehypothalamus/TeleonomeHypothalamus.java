@@ -530,7 +530,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						Hashtable<String,ArrayList> deneChainsToRememberByTeleonome = aDenomeManager.getDeneChainsToRememberByTeleonome();
 						String rememberedeneChainPointer;
 						
-						String valueType;
+						String valueType, units;
 						TimeZone timeZone = aDenomeManager.getTeleonomeTimeZone();
 						ArrayList teleonomeRememberedDeneChainsArrayList = deneChainsToRememberByTeleonome.get(teleonomeName);
 						subscriberThreadLogger.debug("for " + teleonomeName + " teleonomeRememberedDeneChainsArrayList: " + teleonomeRememberedDeneChainsArrayList );
@@ -556,9 +556,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 										includedRememberedIdentity = new Identity(deneChainIdentity.getTeleonomeName(), deneChainIdentity.getNucleusName(), deneChainIdentity.getDenechainName(), dene.getString(TeleonomeConstants.DENE_DENE_NAME_ATTRIBUTE),deneWord.getString(TeleonomeConstants.DENEWORD_NAME_ATTRIBUTE));
 										value = getDeneWordByIdentity(jsonMessage,includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 										valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+										units = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_UNIT_ATTRIBUTE);
 										subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
 										if(value!=null && valueType!=null) {
-											aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE);			
+											aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE, units);			
 										}else {
 											subscriberThreadLogger.warn("Unwrap of " + teleonomeName + " FAILED because value:" + value  + " and valueType=" + valueType);
 											
@@ -594,9 +595,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 									includedRememberedIdentity = new Identity(deneIdentity.getTeleonomeName(), deneIdentity.getNucleusName(), deneIdentity.getDenechainName(), deneJSONObject.getString(TeleonomeConstants.DENE_DENE_NAME_ATTRIBUTE),deneWord.getString(TeleonomeConstants.DENEWORD_NAME_ATTRIBUTE));
 									value = getDeneWordByIdentity(jsonMessage,includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 									valueType = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+									units = (String) getDeneWordByIdentity(jsonMessage, includedRememberedIdentity, TeleonomeConstants.DENEWORD_UNIT_ATTRIBUTE);
 									subscriberThreadLogger.debug("about to unwrap " + includedRememberedIdentity.toString() + " with value:" + value  + " and valueType=" + valueType);
 									if(value!=null && valueType!=null) {
-										aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE);			
+										aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, includedRememberedIdentity.toString(), valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE, units);			
 									}else {
 										subscriberThreadLogger.warn("Unwrap of " + includedRememberedIdentity.toString() + " FAILED because value:" + value  + " and valueType=" + valueType);
 										
@@ -624,9 +626,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								rememberedWordPointer = (String) teleonomeRememberedWordsArrayList.get(i);
 								value = getDeneWordByIdentity(jsonMessage,new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 								valueType = (String) getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_VALUETYPE_ATTRIBUTE);
+								units = (String) getDeneWordByIdentity(jsonMessage, new Identity(rememberedWordPointer), TeleonomeConstants.DENEWORD_UNIT_ATTRIBUTE);
 								subscriberThreadLogger.debug("about to unwrap " + rememberedWordPointer + " with value:" + value  + " and valueType=" + valueType);
 								if(value!=null && valueType!=null) {
-									aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE);
+									aMnemosyneManager.unwrap( teleonomeName, lastPulseTime, rememberedWordPointer, valueType,value, TeleonomeConstants.REMEMBERED_DENEWORD_SOURCE_PULSE, units);
 								}else {
 									subscriberThreadLogger.warn("Unwrap of " + rememberedWordPointer + " FAILED because value:" + value  + " and valueType=" + valueType);
 									
