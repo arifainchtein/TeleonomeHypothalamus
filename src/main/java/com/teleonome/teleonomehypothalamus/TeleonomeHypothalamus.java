@@ -1,6 +1,7 @@
 package com.teleonome.teleonomehypothalamus;
 
 
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -639,6 +640,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								}
 							}
 						}
+						logger.debug("publishing to heart " + organismViewIPInfoJSONObject.toString(4));
 						organismViewIPInfoJSONObject.put(teleonomeName,teleonomeAddress);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_IP, organismViewIPInfoJSONObject.toString());
 
