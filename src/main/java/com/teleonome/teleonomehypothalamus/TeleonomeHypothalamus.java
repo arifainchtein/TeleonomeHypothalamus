@@ -639,15 +639,17 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 								}
 							}
 						}
+						organismViewIPInfoJSONObject.put(teleonomeName,teleonomeAddress);
+						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_IP, organismViewIPInfoJSONObject.toString());
+
+						
 						//
 						// nw publish the name of the teleonome and the bootstrapStatus
 						// 
 						organismViewStatusInfoJSONObject.put(teleonomeName,bootstrapStatus);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_STATUS, organismViewStatusInfoJSONObject.toString());
 
-						organismViewIPInfoJSONObject.put(teleonomeName,teleonomeAddress);
-						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_IP, organismViewIPInfoJSONObject.toString());
-
+						
 						
 						 ssidJSONArray = NetworkUtilities.getSSID(false);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_AVAILABLE_SSIDS, ssidJSONArray.toString());
