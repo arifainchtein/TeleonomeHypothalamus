@@ -47,6 +47,7 @@ import com.teleonome.framework.utils.Utils;
 public class TeleonomeHypothalamus extends Hypothalamus{
 
 	JSONObject organismViewStatusInfoJSONObject = new JSONObject();
+	JSONObject organismViewIPInfoJSONObject = new JSONObject();
 	public final static Logger observerThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + ObserverThread.class.getSimpleName());
 	public final static Logger subscriberThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + SubscriberThread.class.getSimpleName());
 	public final static Logger selfSubscriberThreadLogger = Logger.getLogger(TeleonomeHypothalamus.class.getName() + "." + SubscriberThread.class.getSimpleName());
@@ -367,6 +368,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			Identity identity = null;
 			String statusMessage = "";
 			String bootstrapStatus = "";
+			
 			String operationMode = "";
 			
 			String identityPointer="";
@@ -485,8 +487,9 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						 statusMessage = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
 
 						identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_OPERATIONAL_STATUS_BOOTSTRAP_EQUIVALENT);
-						 bootstrapStatus = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
-						subscriberThreadLogger.debug("received from#" + teleonomeName + "#" + teleonomeAddress  + "#" + lastPulseTimestamp + "#" + statusMessage + "#" + bootstrapStatus);
+						 bootstrapStatus = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE); 
+						 
+						 subscriberThreadLogger.debug("received from#" + teleonomeName + "#" + teleonomeAddress  + "#" + lastPulseTimestamp + "#" + statusMessage + "#" + bootstrapStatus);
 						if(bootstrapStatus==null)bootstrapStatus="success";
 						identity = new Identity("@" + teleonomeName + ":" + TeleonomeConstants.NUCLEI_PURPOSE + ":" +  TeleonomeConstants.DENECHAIN_OPERATIONAL_DATA + ":" + TeleonomeConstants.DENE_TYPE_VITAL +":" + TeleonomeConstants.DENEWORD_STATUS);
 						 operationMode = (String)getDeneWordByIdentity(jsonMessage, identity, TeleonomeConstants.DENEWORD_VALUE_ATTRIBUTE);
@@ -642,6 +645,10 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 						organismViewStatusInfoJSONObject.put(teleonomeName,bootstrapStatus);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_STATUS, organismViewStatusInfoJSONObject.toString());
 
+						organismViewIPInfoJSONObject.put(teleonomeName,teleonomeAddress);
+						publishToHeart(TeleonomeConstants.HEART_TOPIC_ORGANISM_IP, organismViewIPInfoJSONObject.toString());
+
+						
 						 ssidJSONArray = NetworkUtilities.getSSID(false);
 						publishToHeart(TeleonomeConstants.HEART_TOPIC_AVAILABLE_SSIDS, ssidJSONArray.toString());
 						//
