@@ -52,24 +52,6 @@
     </execution>
   </executions>
     </plugin>
-   <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-           <executions>
-                <execution>
-                    <id>timestamp-property</id>
-                    <goals>
-                        <goal>timestamp-property</goal>
-                    </goals>
-                    <configuration>
-                        <name>build.time</name>
-                        <pattern>dd/MM/yyyy HH:mm</pattern>
-                        <locale>en_AU</locale>
-                        <timeZone>Australia/Victoria</timeZone>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
   <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-compiler-plugin</artifactId>
@@ -79,29 +61,6 @@
     <target>1.8</target>
   </configuration>
 </plugin>
-   <plugin>
-    <groupId>com.google.code.maven-replacer-plugin</groupId>
-    <artifactId>replacer</artifactId>
-    <executions>
-        <execution>
-            <phase>generate-sources</phase>
-            <goals>
-                <goal>replace</goal>
-            </goals>
-        </execution>
-    </executions>
-    <configuration>
-        <includes>
-            <include>${basedir}/src/main/java/com/teleonome/teleonomehypothalamus/TeleonomeHypothalamus.java</include>
-        </includes>
-        <replacements>
-            <replacement>
-                <token>public\sfinal\sstatic\sString\sBUILD_NUMBER=.*</token> 
-                <value>public final static String BUILD_NUMBER="${build.time}";</value>
-            </replacement>
-        </replacements>
-    </configuration>
-</plugin> 
     </plugins>
 </build>
 </project>
