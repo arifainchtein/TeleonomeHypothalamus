@@ -30,7 +30,6 @@
    <plugins>
    <plugin>
       <artifactId>maven-assembly-plugin</artifactId>
-      <version>3.2.0</version>
       <configuration>
        <outputDirectory>../../</outputDirectory>
         <archive>
@@ -56,8 +55,7 @@
    <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
-            <version>3.2.0</version>
-            <executions>
+           <executions>
                 <execution>
                     <id>timestamp-property</id>
                     <goals>
@@ -84,7 +82,6 @@
    <plugin>
     <groupId>com.google.code.maven-replacer-plugin</groupId>
     <artifactId>replacer</artifactId>
-    <version>1.5.3</version>
     <executions>
         <execution>
             <phase>generate-sources</phase>
