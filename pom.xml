@@ -32,6 +32,12 @@
     <artifactId>framework</artifactId>
      <version>1</version>
 </dependency>
+  <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+<dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <version>3.5.0</version>
+</dependency>
   
   </dependencies>
    
