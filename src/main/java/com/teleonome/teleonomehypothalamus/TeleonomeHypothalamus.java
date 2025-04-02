@@ -87,14 +87,14 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 		}
 
 		
-//		try {
-//			executeTimeBasedMutations();
-//		} catch (InvalidMutation | InvalidDenomeException e) {
-//			// TODO Auto-generated catch block
-//			logger.warn(Utils.getStringException(e));
-//		}
-		
-		
+		try {
+			executeTimeBasedMutations();
+		} catch (InvalidMutation | InvalidDenomeException e) {
+			// TODO Auto-generated catch block
+			logger.warn(Utils.getStringException(e));
+		}
+		 
+		        
 		
 //		ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 //		ses.scheduleAtFixedRate(new Runnable() {
