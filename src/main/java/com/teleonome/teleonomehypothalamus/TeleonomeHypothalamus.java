@@ -18,10 +18,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
@@ -32,14 +28,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 
 import com.teleonome.framework.TeleonomeConstants;
 import com.teleonome.framework.denome.DenomeUtils;
 import com.teleonome.framework.denome.Identity;
 import com.teleonome.framework.exception.InvalidDenomeException;
-import com.teleonome.framework.exception.InvalidMutation;
 import com.teleonome.framework.hypothalamus.Hypothalamus;
 import com.teleonome.framework.hypothalamus.PulseThread;
 import com.teleonome.framework.network.NetworkUtilities;
