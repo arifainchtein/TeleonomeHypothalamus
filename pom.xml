@@ -63,6 +63,14 @@
           </goals>
           <configuration>
             <outputFile>${project.basedir}/../../TeleonomeHypothalamus.jar</outputFile>
+            <filters>
+              <filter>
+                <artifact>com.teleonome:framework</artifact>
+                <includes>
+                  <include>com/teleonome/**</include>
+                </includes>
+              </filter>
+            </filters>
             <transformers>
               <transformer implementation="org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer"/>
               <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
