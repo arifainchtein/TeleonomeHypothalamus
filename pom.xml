@@ -62,7 +62,7 @@
             <goal>shade</goal>
           </goals>
           <configuration>
-            <outputFile>${project.build.directory}/../../TeleonomeHypothalamus.jar</outputFile>
+            <outputFile>${project.basedir}/../../TeleonomeHypothalamus.jar</outputFile>
             <transformers>
               <transformer implementation="org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer"/>
               <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
