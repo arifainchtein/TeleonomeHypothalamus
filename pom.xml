@@ -45,42 +45,29 @@
   <finalName>TeleonomeHypothalamus</finalName>
    <plugins>
    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-shade-plugin</artifactId>
-      <version>3.5.1</version>
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-transform-maven-shade-plugin-extensions</artifactId>
-          <version>0.2.0</version>
-        </dependency>
-      </dependencies>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <version>3.5.0</version>
+      <configuration>
+       <outputDirectory>../../</outputDirectory>
+        <archive>
+          <manifest>
+             <mainClass>com.teleonome.teleonomehypothalamus.TeleonomeHypothalamus</mainClass>
+          </manifest>
+        </archive>
+        <descriptorRefs>
+          <descriptorRef>jar-with-dependencies</descriptorRef>
+        </descriptorRefs>
+        <appendAssemblyId>false</appendAssemblyId>
+      </configuration>
       <executions>
-        <execution>
-          <phase>package</phase>
-          <goals>
-            <goal>shade</goal>
-          </goals>
-          <configuration>
-            <outputFile>${project.basedir}/../../TeleonomeHypothalamus.jar</outputFile>
-            <filters>
-              <filter>
-                <artifact>com.teleonome:framework</artifact>
-                <includes>
-                  <include>com/teleonome/**</include>
-                </includes>
-              </filter>
-            </filters>
-            <transformers>
-              <transformer implementation="org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer"/>
-              <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                <mainClass>com.teleonome.teleonomehypothalamus.TeleonomeHypothalamus</mainClass>
-              </transformer>
-            </transformers>
-          </configuration>
-        </execution>
-      </executions>
+    <execution>
+      <id>make-assembly</id> <!-- this is used for inheritance merges -->
+      <phase>package</phase> <!-- bind to the packaging phase -->
+      <goals>
+        <goal>single</goal>
+      </goals>
+    </execution>
+  </executions>
     </plugin>
   <plugin>
   <groupId>org.apache.maven.plugins</groupId>
