@@ -113,6 +113,38 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 	}
 
 
+	//
+	// Writes /etc/avahi/services/teleonome.service so avahi-daemon announces _teleonome._tcp on
+	// port 6666 under the same instance name JmDNS used (hostName), which DiscoverTeleonoms on
+	// the other Teleonomes looks for. avahi re-reads the directory by itself when the file changes.
+	// Returns false when avahi isn't installed or the file can't be written.
+	//
+	private boolean publishTeleonomeServiceWithAvahi(String serviceName) {
+		File servicesDir = new File("/etc/avahi/services");
+		if(!servicesDir.isDirectory()) return false;
+		String escapedName = serviceName.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+		String xml = "<?xml version=\"1.0\" standalone='no'?>\n"
+				+ "<!DOCTYPE service-group SYSTEM \"avahi-service.dtd\">\n"
+				+ "<service-group>\n"
+				+ "  <name>" + escapedName + "</name>\n"
+				+ "  <service>\n"
+				+ "    <type>_teleonome._tcp</type>\n"
+				+ "    <port>6666</port>\n"
+				+ "    <txt-record>Teleonome service</txt-record>\n"
+				+ "  </service>\n"
+				+ "</service-group>\n";
+		File serviceFile = new File(servicesDir, "teleonome.service");
+		try {
+			// rewriting an unchanged file would make avahi withdraw and re-announce the service
+			if(serviceFile.exists() && FileUtils.readFileToString(serviceFile, "UTF-8").equals(xml)) return true;
+			FileUtils.writeStringToFile(serviceFile, xml, "UTF-8");
+			return true;
+		} catch (IOException e) {
+			observerThreadLogger.warn(Utils.getStringException(e));
+			return false;
+		}
+	}
+
 	class ObserverThread extends Thread{
 		JmDNS mdnsServer;
 		
@@ -126,10 +158,21 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 			try {
 				InetAddress inetAddress = getIpAddress();
 				observerThreadLogger.info("about to create teleonome service with inetAddress=" + inetAddress.getHostAddress());
-				mdnsServer = JmDNS.create(inetAddress);
-				// Register a test service.
-				ServiceInfo testService = ServiceInfo.create(bonjourServiceType, hostName, 6666, "Teleonome service");
-				mdnsServer.registerService(testService);
+				//
+				// 2026-10-31: the long-lived JmDNS here kept re-announcing its A record
+				// ("<host>-lan.local") several times a second, and the Teleonomes set each other
+				// off - ~22 mDNS packets/s on the factory WiFi, enough to exhaust the heap of
+				// every ESP32 on it (Annabelle panics, Continuity bug #24). avahi-daemon already
+				// runs on every Pi, so it publishes the service instead; JmDNS only when avahi isn't there.
+				//
+				if(publishTeleonomeServiceWithAvahi(hostName)) {
+					observerThreadLogger.info("teleonome service published by avahi as " + hostName);
+				}else {
+					observerThreadLogger.warn("avahi not available, publishing the teleonome service with JmDNS");
+					mdnsServer = JmDNS.create(inetAddress);
+					ServiceInfo testService = ServiceInfo.create(bonjourServiceType, hostName, 6666, "Teleonome service");
+					mdnsServer.registerService(testService);
+				}
 				logger.debug("created teleonome service");
 				thisTeleonomeName = aDenomeManager.getDenomeName();
 				
