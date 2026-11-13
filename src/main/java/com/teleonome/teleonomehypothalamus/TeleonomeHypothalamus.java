@@ -115,7 +115,7 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 
 	//
 	// Writes /etc/avahi/services/teleonome.service so avahi-daemon announces _teleonome._tcp on
-	// port 6666 under the same instance name JmDNS used (hostName), which DiscoverTeleonoms on
+	// port 6666 under the Teleonome's name (the same name JmDNS uses), which DiscoverTeleonoms on
 	// the other Teleonomes looks for. avahi re-reads the directory by itself when the file changes.
 	// Returns false when avahi isn't installed or the file can't be written.
 	//
@@ -165,16 +165,19 @@ public class TeleonomeHypothalamus extends Hypothalamus{
 				// every ESP32 on it (Annabelle panics, Continuity bug #24). avahi-daemon already
 				// runs on every Pi, so it publishes the service instead; JmDNS only when avahi isn't there.
 				//
-				if(publishTeleonomeServiceWithAvahi(hostName)) {
-					observerThreadLogger.info("teleonome service published by avahi as " + hostName);
+				// 2026-11-13 (Ari): announced under the Teleonome's name (Annabelle, Factory), not the machine's
+				// (annabelle-teleonome, Factory2): the others list and store it by that name, look up what to remember
+				// from it by that name, and below a Teleonome skips itself by comparing with its own name
+				thisTeleonomeName = aDenomeManager.getDenomeName();
+				if(publishTeleonomeServiceWithAvahi(thisTeleonomeName)) {
+					observerThreadLogger.info("teleonome service published by avahi as " + thisTeleonomeName);
 				}else {
 					observerThreadLogger.warn("avahi not available, publishing the teleonome service with JmDNS");
 					mdnsServer = JmDNS.create(inetAddress);
-					ServiceInfo testService = ServiceInfo.create(bonjourServiceType, hostName, 6666, "Teleonome service");
+					ServiceInfo testService = ServiceInfo.create(bonjourServiceType, thisTeleonomeName, 6666, "Teleonome service");
 					mdnsServer.registerService(testService);
 				}
 				logger.debug("created teleonome service");
-				thisTeleonomeName = aDenomeManager.getDenomeName();
 				
 								
 			} catch (IOException e) {
